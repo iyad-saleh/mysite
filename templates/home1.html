@@ -1,0 +1,19 @@
+{% extends "home.html" %}
+{% load static %}
+{% block content %}
+    
+   {%  include 'carousel.html'  %}
+      <hr class="featurette-divider">
+      <!--  -->
+      
+      <div class="container marketing">
+        <!-- Three columns of text below the carousel -->
+        {%  include 'marketing.html'  %}
+        <hr class="featurette-divider">
+        <!-- START THE FEATURETTES -->
+        {%  include 'FEATURETTES.html'  %}
+
+        </div><!-- /.container -->
+  {% endblock content %}
+
+    

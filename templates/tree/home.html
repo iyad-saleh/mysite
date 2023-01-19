@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+
+<div class="chart mt-3" id="basic-example"></div>
+
+
+ {% endblock content %}
+
+  
+
+
+{% block header %}
+   
+    <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}"> -->
+       <link rel="stylesheet" type="text/css" href="{% static 'css/all.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'Treant.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'custom-colored.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'collapsable.css' %}">
+    <!-- <link rel="stylesheet" type="text/css" href="{% static 'basic-example.css' %}"> -->
+ {% endblock %}
+ 
+{% block style %}
+     <style type="text/css">
+    .fas ,.fa{
+   color:blue;
+ }
+    </style> 
+{% endblock style %}
+
+{% block extrascripts %}
+  
+    <!-- <script src="{% static 'jquery.min.js' %}" ></script> -->
+    <script src="{% static 'vendor/raphael.js' %}" ></script>
+    <script src="{% static 'Treant.js' %}" ></script>
+    <script src="{% static 'vendor/jquery.easing.js' %}" ></script>
+    <script type="text/javascript">
+
+list_node={};
+//  return  true if he is parent to another node 
+function compareid(myid,list_node){
+  // console.log("???",myid,list_node)
+  for (let key in list_node) {
+      let root = list_node.root
+      // console.log("root is ...",root)
+      if ((list_node[key] === myid) &&( key !=='root'))
+           { 
+            // console.log("key.....",key)
+            return true 
+           }
+      }
+    return false
+}
+
+function itsparent(myid,list_node)
+{
+    // console.log("start work, its parent? test ",myid)
+    for (let key in list_node)  {
+       if (key === myid ) {
+        // console.log(   myid,"it's parent to all  ")
+        return true
+       }else{
+        // console.log(key, "start work itsparent",myid)
+       }
+     }
+}
+
+
+function newsearch(obj){
+  // console.log('newsearch',obj)
+   // let myid = obj.querySelector('.node-id').innerHTML;
+   let myid = obj.dataset.id;
+   // console.log("xxxxxx",myid)
+   if ((compareid(myid,list_node))&& !(itsparent(myid,list_node))) {
+       // console.log(" no need getAjax he is  in list as parent ")
+     
+     }else if (itsparent(myid,list_node)){
+        // console.log(" neeeed  getAjax he is in parent ")
+        list_node={};
+        getAjax({{ user.id }},myid);
+    }else{
+         // console.log(" neeeed  getAjax he is in edge ")
+         list_node={}
+         getAjax({{ user.id }},myid);
+       }
+}
+
+function searchChild(obj,parentId){
+
+  list_node[obj.text.id]=parentId
+  if (obj.children){
+    for (let i = 0; i < obj.children.length; i++) {
+          searchChild(obj.children[i],obj.text.id)
+      }
+    }
+  }
+
+function searchForId(obj){
+  list_node["root"] = obj.nodeStructure.text.id
+  list_node[obj.nodeStructure.text.id] = obj.nodeStructure.text.id
+  if (obj.nodeStructure.children) {
+    for (let i = 0; i < obj.nodeStructure.children.length; i++) {
+        searchChild(obj.nodeStructure.children[i],obj.nodeStructure.text.id)
+    }
+  }
+}
+
+
+function getAjax(id,childId) {
+        $.ajax({ 
+              type: 'GET', 
+              data: { root: id ,child:childId}, 
+              url: "{% url 'nodeChild' %}", 
+               dataType: 'json',
+              // data: { get_param: 'value' }, 
+              success: function (data) {
+                  let chart_config =   data;
+                  // console.log("chart_config ---" ,chart_config);
+                  // console.log('chart_config...  ',chart_config.nodeStructure.text.id );
+                  searchForId(chart_config);
+                 let my_chart = new Treant(chart_config, null, $ );
+                  foo();
+                  
+                  // console.log('list_node',list_node)
+              }
+          });
+  }  
+         
+{% if user.id %}
+
+ getAjax( {{ user.id }},{{ user.id }} ); 
+ {% endif %}
+
+
+$(document).ready(foo());
+  
+// <div class="progress">
+//   <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+// </div>
+ 
+
+function foo(){
+       
+    let nodename = document.querySelectorAll('.node-name') 
+    let Bounce = document.querySelectorAll('.node-Bounce') 
+    let nodeid = document.querySelectorAll('.node-id') 
+    // let likeleft = document.querySelectorAll('.node-likeleft') 
+    // let likeright = document.querySelectorAll('.node-likeright') 
+    // let client  = document.querySelectorAll('.node-client') 
+    let active  = document.querySelectorAll('.node-active') 
+    let  xmlString = document.querySelectorAll('.node-title') 
+  
+    for (let i = 0; i < xmlString.length; i++) {
+      let par  = xmlString[i].parentElement.querySelector('.node-name')
+      let temp = xmlString[i].textContent.split(',')
+      // console.log('\n\ntemp[4]:',temp[4])
+
+      // console.log('xmlString[i].textContent.split ',temp)
+      let ttemp = '<div class="row  likeContainer d-flex justify-content-around shadow-lg p-0 m-0   rounded"><span>'+temp[2]+'<img src="/static/media/svg/coins.svg" style="width:1rem;margin-right: 1px; "></span><span>'+temp[1]+'<img src="/static/media/svg/teamwork1.svg" style="width:1.5rem;margin: 0;  "></span><span>'+temp[0]+'<img src="/static/media/svg/coins.svg" style="width:1rem;margin-left: 1px; "></span></div>'
+    // let parent = xmlString[i].parentElement;
+      let wrapper= document.createElement('div');
+      wrapper.innerHTML= ttemp
+      xmlString[i].innerHTML=''
+      xmlString[i].appendChild(wrapper)
+      let cnt = parseInt(temp[3],10)
+      // console.log('cnt',cnt)
+      for (let ii = 0; ii < cnt ; ii++) {
+          let newicon  = document.createElement('i')
+          newicon.setAttribute("class","fa fa-heartbeat mx-1");
+          newicon.setAttribute("style","color:red;");
+          newicon.setAttribute("aria-hidden","true ");
+          par.appendChild(newicon)
+          }
+
+       }
+  
+   // let noeRect = id.parentElement;
+   
+   //<i class="fa fa-heart-o" aria-hidden="true"></i>
+   for (let i = 0; i < active.length; i++) {
+    
+      if (active[i].innerHTML == 'true') {
+         active[i].innerHTML =''
+         } else {
+                active[i].innerHTML =''
+                let newicon  = document.createElement('i')
+                newicon.setAttribute("class","fa fa-lock fa-5");
+                newicon.setAttribute("aria-hidden","true ");
+                active[i].appendChild(newicon)
+                }
+       }
+
+  for (let i = 0; i < nodeid.length; i++) {
+    nodeid[i].setAttribute("style","opacity: 0.8;");
+    let par = nodeid[i].parentElement;
+    let iid = nodeid[i].innerHTML.split(',')[0]
+    let help =  nodeid[i].innerHTML.split(',')[1] *12.5  
+    // console.log("hhhhh",nodeid[i].innerHTML.split(',')[1],help)
+    par.setAttribute("data-id",iid);
+    par.setAttribute("onclick", "newsearch(this);" );
+
+// let ttemp = '<div class="row d-flex justify-content-around shadow-lg p-0 m-0   rounded">'
+//    ttemp +='<div class="progress">'
+//    ttemp +='<div class="progress-bar  w-75" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">'
+//    ttemp +=nodeid[i].innerHTML
+//    ttemp +='</div></div></div>'
+//       let wrapper= document.createElement('div');
+//       wrapper.innerHTML= ttemp
+//       nodeid[i].innerHTML=''
+//       nodeid[i].appendChild(wrapper)
+    let temp = '<div class="progress">'
+  temp +='<div role="progressbar" class="progress-bar   progress-bar-animated progress-bar-striped   w-'+help+'"  aria-valuenow="'+help +'"   style="color:black;font-weight: 500;  width: '+help +'%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="80"  >'+iid+'</div></div>'
+nodeid[i].innerHTML=temp
+
+  }
+
+
+}
+    // <div role="progressbar" class="progress-bar progress-bar-striped  w-80" aria-valuenow="80" style="width: 25%" aria-valuemin="0" aria-valuemax="80">10332</div>
+//   <div role="progressbar"   class="progress-bar progress-bar-striped w-75"  aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+
+
+
+
+    </script>
+{% endblock %}
+ 
+
+
+ // for (let i = 0; i < Bounce.length; i++) {
+//   let cnt = parseInt(Bounce[i].innerHTML,10)
+//   let par  = Bounce[i].parentElement.querySelector('.node-name')
+//   // console.log(cnt)
+//   Bounce[i].innerHTML=''
+//   for (let ii = 0; ii < cnt ; ii++) {
+//       let newicon  = document.createElement('i')
+//       newicon.setAttribute("class","fa fa-heartbeat mx-1");
+//       newicon.setAttribute("style","color:red;");
+//       newicon.setAttribute("aria-hidden","true ");
+//       par.appendChild(newicon)
+//       }
+//    }
+
+//
+// for (let i = 0; i < likeright.length; i++) {
+//       let likeContainer = document.createElement('div')
+//       likeContainer.setAttribute("class","row  likeContainer d-flex justify-content-around shadow-lg p-0 m-0   rounded");
+//       const newicon  = document.createElement('img')
+//       newicon.setAttribute("src","{% static 'media/svg/coins.svg' %}");
+//       newicon.setAttribute("style","width:1rem;margin-left: 10px; ");
+//       likeright[i].appendChild(newicon)
+//       let nodeRect = likeright[i].parentElement;
+//       let nodeid = nodeRect.querySelector('.node-id')
+//       likeContainer.appendChild(likeright[i])
+//       nodeRect.insertBefore(likeContainer,nodeid)
+ 
+//     }
+//
+     // for (let i = 0; i < client.length; i++) {
+     //  let likeContainer = likeleft[i].parentElement.querySelector('.likeContainer')
+     //  const newicon  = document.createElement('img')      // newicon.setAttribute("class","fa fa-usd");
+     //  newicon.setAttribute("src","{% static 'media/svg/teamwork1.svg' %}");
+     //  newicon.setAttribute("style","width:2rem;  ");
+     //  client[i].appendChild(newicon)
+     //  likeContainer.appendChild(client[i])
+     //    }
+
+    // for (let i = 0; i < likeleft.length; i++) {
+    //   let likeContainer = likeleft[i].parentElement.querySelector('.likeContainer')
+    //   const newicon  = document.createElement('img')
+    //   newicon.setAttribute("src","{% static 'media/svg/coins.svg' %}");
+    //   newicon.setAttribute("style","width:1rem;margin-left: 10px; ");
+    //   likeleft[i].appendChild(newicon)
+    //  likeContainer.appendChild(likeleft[i])
+    // }

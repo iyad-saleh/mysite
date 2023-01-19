@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% load auth_extras %}
+{% block content %}
+    <div class="row justify-content-md-center mt-2  align-items-center">
+
+    <div class="col-md-6 col-sm-10 mx-auto text-right ">
+        <div class="content-section mt-5 ">
+       
+            <form method="POST"  action="{% url 'Employee' id=obj.id %}">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">
+                    {% if obj.is_staff %}   
+                        موظف مسؤول {{obj.first_name}} {{obj.last_name}}  {{ obj.username}}
+                    {% elif obj|has_group:'seller' %}
+                        موزع صاحب محل   {{obj.first_name}} {{obj.last_name}}  {{ obj.username}}
+                     {% else %} 
+                    توظيف  {{obj.first_name}} {{obj.last_name}}  {{ obj.username}}
+                    {% endif %}
+                    </legend>
+                     <select name="employeeJob" class="form-control">
+                  
+                        <option value="0" selected  >وكالة عادية</option>
+                        <option value="seller" >موزع (صاحب محل)</option>
+                        <option value="is_staff" >موظف مسؤول </option>
+
+                    </select>
+                     
+                </fieldset>
+                <div class="form-group">
+                    <button class="btn btn-outline-info" type="submit">تغيير</button>
+                    <a  class="btn btn-info mx-4 " href="{%  url 'UserListView' %}">عودة</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

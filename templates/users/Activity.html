@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+
+ 
+<div class="row d-flex justify-content-center mt-4">
+  <div class="col-sm-11 col-md-10  mx-auto mb-3">
+   
+                <div class=" table-responsive table-hover table-striped table-sm">
+                   <caption  ><h3  class="text-right">قائمة النشاطات</h3>  </caption>
+                  <table class="table text-right">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      
+                      <th scope="col">الموضوع</th>
+                      <th scope="col">التاريخ</th>
+ 
+                       
+                    </tr>
+                  </thead>
+                  <tbody>
+                   {% for activity in activities  %} 
+                       {% if activity.read %}
+                      <tr class="table-success"> {% else %}<tr class="table-secondary"> {% endif %}
+                        <td class="activityid" >{{ activity.id }}</td>
+                        <td>{{ activity.title }}</td>
+                        <td>{{ activity.created|date:"Y/m/d  G:i:s " }}</td>
+                      </tr>
+                      
+                {% endfor  %}
+
+                  </table>
+                </div>
+
+         <div class="paginated">
+        {% if is_paginated %} 
+        {% if activities.has_previous %}
+           <a class="btn btn-outline-info mb-4" href="?page=1&rowNum={{ rowNum }}">الصفحة الاولى</a>
+           <a class="btn btn-outline-info mb-4" href="?page={{ activities.previous_page_number }}&rowNum={{ rowNum }}">الصفحة السابقة</a >
+ 
+        {% endif %} 
+        {% for num in activities.paginator.page_range %} 
+        {% if activities.number == num %}
+        <a class="btn btn-info mb-4" href="?page={{ num }}&rowNum={{ rowNum }}">{{ num }}</a>
+        {% elif num > activities.number|add:'-3' and num < activities.number|add:'3' %}
+        <a class="btn btn-outline-info mb-4" href="?page={{ num }}&rowNum={{ rowNum }}">{{ num }}</a>
+        {% endif %} 
+        {% endfor %} 
+        {% if activities.has_next %}
+        <a class="btn btn-outline-info mb-4"  href="?page={{ activities.next_page_number }}&rowNum={{ rowNum }}">التالي</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ activities.paginator.num_pages }}&rowNum={{ rowNum }}">آخر صفحة</a>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+ </div>
+     <hr class="featurette-divider  mx-5 my-5">
+{% endblock content %}
+
+
+{% block extrascripts %}
+  <script type="text/javascript">
+
+$(document).ready(foo());
+function foo(){
+
+
+ let activityid = document.querySelectorAll('.activityid') 
+ let activitylist=[]
+
+ // console.log('activityid',activityid)
+for (let i = 0; i < activityid.length; i++) {
+    activitylist.push(activityid[i].innerHTML);
+// console.log('activityid[i].',activityid[i].innerHTML )
+
+}
+
+
+// console.log('activitylist',activitylist )
+// console.log('activitylist',activitylist.toString())
+ $.get( "{% url 'readActivity' %}",{term: activitylist.toString()  });
+         
+
+ 
+
+
+}
+
+    </script>
+{% endblock %}

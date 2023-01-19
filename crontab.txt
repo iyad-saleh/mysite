@@ -1,0 +1,38 @@
+export EDITOR=/usr/bin/nano
+
+crontab -l      // list all job 
+
+crontab -e      // start edite table 
+
+crontab -r      // remove table
+
+0 0 * * 5    //every fri
+
+
+first we must know   where is python 
+whereis python3  or which python
+
+
+
+for my enve 
+
+After creating the environment, activate it, and execute
+which python
+The returned path is the Python executable to use in the cron job definition
+
+0 0 * * 5 cd /home/eyad/mysite && $(which python3) python manage.py calcNode
+
+*******************************
+ /home/eyad/mysite/venv/bin/python3 /home/eyad/mysite/manage.py calcNode
+******************************
+ #!/bin/sh
+source /home/user/project/env/bin/activate
+cd /home/user/project/
+./manage.py command arg
+******************************
+
+
+
+
+0 0 * * 5  /home/eyad/mysite/venv/bin/python3 /home/eyad/mysite/manage.py calcNode
+59 * * * *  /home/eyad/mysite/venv/bin/python3 /home/eyad/mysite/manage.py calcNode

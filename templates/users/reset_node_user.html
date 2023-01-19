@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="row justify-content-md-center align-items-center">
+
+    <div class="col-md-6 col-sm-10 mx-auto text-right">
+        <div class="content-section">
+       
+            <form method="POST"  action="{% url 'PasswordResetforNode' id=obj.id %}">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">تغيير كلمة السر خزنة للمشترك {{obj.first_name}} {{obj.last_name}}  {{ obj.username}}</legend>
+                     
+                </fieldset>
+                <div class="form-group">
+                    <button class="btn btn-outline-info" type="submit">تغيير</button>
+                    <a  class="btn btn-info mx-4 " href="{%  url 'homeblog' %}">عودة</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

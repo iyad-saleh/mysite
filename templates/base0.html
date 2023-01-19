@@ -1,0 +1,115 @@
+{% load static %}
+{% load auth_extras %}
+<!doctype html>
+<html dir="rtl" lang="ar">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<!-- <link rel="shortcut icon" type="image/x-icon" href="{% static 'favicon.ico' %}"> -->
+		<link rel="shortcut icon" type="image/x-icon" href="{% static 'logo2.png' %}">
+		<!-- <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" > -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+		<link rel="stylesheet" type="text/css" href="{% static 'css/all.css' %}">
+		{% if title %}
+			<title>{{ title }}</title>
+		{% else %}
+			<title>أهلا وسهلا </title>
+		{% endif %}
+		{% block header %}
+		{% endblock %}
+		{% block style %}
+		{% endblock style %}
+
+
+		<style type="text/css">
+
+.dropdown, .dropup{
+	margin-left: 0;
+	margin-right:  0;
+	padding: 0;
+
+}
+
+	.navbar-dark .navbar-nav .nav-link {
+
+             color: white;
+       }
+
+	.bg-dark {
+ /*background-color: #0088cc!important;*/
+    background-image: linear-gradient(to right,	#00c6ff, #0072ff);
+    font-weight: 500;
+    color: white;
+    opacity: 0.7!important;
+
+}
+/* this new */
+.bg-dark:hover {
+ 
+    opacity: 1!important;
+
+}
+
+.dropdown-menu{
+	background-image: linear-gradient(to bottom,	#00c6ff, #0072ff);
+	 opacity: 1!important;
+	 transition-duration: 5s;
+}
+.dropdown-toggle:after { content: none }
+ 
+		</style>
+	</head>
+	<body  >
+		<header class="mb-5">
+			{%  include 'nav.html'  %}
+		</header>
+ 	<main role="main"  class="my-5 mr-auto mt-5" id="page-content" style="top: 10%;"  >
+		{%  include 'messages.html'  %}
+
+
+		 {% block content %}{% endblock %}
+
+	</main> 
+   		{%  include 'footer.html'  %}
+      
+
+
+
+    <!-- <script src="{% static 'js/jquery.min.js' %}" ></script> -->
+     
+    <!-- <script src="{% static 'js/popper.min.js' %}" ></script> -->
+    <!-- <script src="{% static 'js/bootstrap.min.js' %}" ></script> -->
+<script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+
+
+    <script src="{% static 'js/holder.min.js' %}" ></script>  
+    {% block extrascripts %}{% endblock %}
+
+    <script type="text/javascript">
+    	 
+
+		let Activity_id  =document.querySelector('#Activity_id')
+		     $.get( "{% url 'autoActivity' %}",function( data ) {
+		     	// console.log('autoActivity', data[0]['label'])
+		     	// console.log(data[0].label)
+		  if (data[0]['label'] == 0 ) {
+		  	 $('#Activity_id').text('')
+		  } else {
+		  	 $('#Activity_id').text(data[0]['label']);
+		  } 	
+         
+           
+          }
+          );
+    </script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    
+     {%  include 'ticker.html'  with ticker=ticker   %}
+       <hr class="featurette-divider mt-5">
+        {% if user.is_superuser %}
+       <div class="container">
+       <div class="row">
+       <a  class="btn btn-primary"  href="{% url 'TickerCreateView'   %}"> اضافة اخبار جديدة  </a><br>
+       </div>
+         {% for item in ticker %}
+          <div class="row mt-2">
+           {{item.title}}
+           <a  class="btn btn-info mx-2 "  href="{% url 'TickerUpdateView'  item.id %}"> تعديل </a>
+           <a  class="btn btn-danger mx-2 "  href="{% url 'TickerDeleteView'  item.id %}"> حذف </a><br>
+       </div>
+       {% endfor %}
+       </div>
+         <hr class="featurette-divider">
+        {% endif %}
+   {%  include 'carousel1.html'  with  carousel=carousel  %}
+
+        
+      
+      
+      <hr class="featurette-divider">
+        
+       
+       {%  include 'FEATURETTES1.html'  with  Featuretts=Featuretts  %}
+
+       
+     
+      
+      <hr class="featurette-divider">
+     
+         {%  include 'marketing1.html'  with  marketing=marketing  %}
+      
+  {% endblock content %}
+
+       {% block extrascripts %}
+      <script type="text/javascript">
+    $('#myCarousel').carousel();
+</script>
+    {% endblock %}

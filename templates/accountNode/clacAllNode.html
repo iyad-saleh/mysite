@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+  
+  <div class="container mt-5">
+    <div class="row text-right">
+      <div class="col">
+        <h2>{{log.messages}}</h2>
+      </div>
+    </div>
+  <div class="row text-right">
+    <div class="col-md-10">
+      <table class="table table-hover table-striped   table-bordered " >
+        <thead>
+          <tr>
+
+              <th scope="col">#</th>
+              <th scope="col">الوكالات الجديدة</th>
+              <th scope="col">المستفيدين </th>
+              <th scope="col"> التجاوز </th>
+              <th scope="col">  Bounce</th>
+              <th scope="col"> الباقي للوكالات من اليسار</th>
+              <th scope="col"> الباقي للوكالات من اليمين  </th>
+              <th scope="col"> قيمة للوكالة </th>
+              <th scope="col"> قيمة الربح وكالة جديدة </th>
+              <th scope="col"> قيمة Bounce</th>
+              <th scope="col"> تارخ الحساب </th>
+              <th scope="col">  الواجب دفعها </th>
+              <th scope="col">  الواردات </th>
+              <th scope="col"> الربح الصافي </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td >{{ log.id }}</td>
+            <td class="totalNodes">{{log.totalNodes}}</td>
+            <td class="totalLike">{{log.totalLike|intcomma}}</td>
+            <td>{{log.overLike|intcomma}}</td>
+            <td class="totalBounce">{{log.totalBounce|intcomma}}</td>
+            <td>{{log.remainLikeleft|intcomma}}</td>
+            <td>{{log.remainLikeright|intcomma}}</td>
+            <td class="nodePrice">{{log.nodePrice|intcomma}}</td>
+            <td class="likePrice">{{log.likePrice|intcomma}}</td>
+            <td class="BouncePrice">{{log.BouncePrice|intcomma}}</td>
+            <td>{{log.created|date:"Y/m/d  G:i:s" }}</td>
+            <td class="totalBlance">{{log.totalBlance|intcomma}}</td>
+
+           <td class="totalnodeBalance"> </td>
+            <td class="summary"> </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </div>
+  
+{% endblock content %}
+{% block extrascripts %}
+     <script type="text/javascript">
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+
+    let totalNodes   = document.querySelectorAll('.totalNodes')
+    let totalLike   = document.querySelectorAll('.totalLike')
+    let totalBounce   = document.querySelectorAll('.totalBounce')
+    let nodePrice   = document.querySelectorAll('.nodePrice')
+    let likePrice   = document.querySelectorAll('.likePrice')
+    let BouncePrice   = document.querySelectorAll('.BouncePrice')
+    let totalBlance   = document.querySelectorAll('.totalBlance')
+    let totalnodeBalance   = document.querySelectorAll('.totalnodeBalance')
+    let summary   = document.querySelectorAll('.summary')
+
+    for (let i = 0; i < totalnodeBalance.length; i++) {
+      let totalNodes = totalnodeBalance[i].parentElement.querySelector('.totalNodes').innerHTML.split(",").join("")
+      let nodePrice = totalnodeBalance[i].parentElement.querySelector('.nodePrice').innerHTML.split(",").join("")
+      totalnodeBalance[i].textContent  =  numberWithCommas( totalNodes * nodePrice); 
+      summary[i].textContent  = numberWithCommas( (totalNodes * nodePrice) - (totalBlance[i].innerHTML.split(",").join("")) );
+
+     }
+     
+
+</script>
+
+{% endblock %}

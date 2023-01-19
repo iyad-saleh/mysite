@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+    
+
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col text-right ">
+        <div class="row mt-2">
+          <div class="col-md-8">
+            <h2  > مجموع الديون المترتبة  حتى هذه اللحظة:  {{total|intcomma}}</h2>
+          </div>
+          </div>
+          <div class="row my-2">
+          <div class="col-md-6">
+            <h2  >رصيدنا في الصندوق:  {{root.balance|intcomma}}</h2>
+          </div>
+           
+        </div>
+       
+    </div>
+  </div>
+    <div class="row ">
+      <div class="col-md-12">
+        <table class="table table-responsive table-hover table-striped table-sm table-bordered text-right" >
+        <caption   ><h4 id="totalSummaryPage">الربح الصفحة</h4></caption>
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">الوكالات الجديدة</th>
+              <th scope="col">المستفيدين </th>
+              <th scope="col"> التجاوز </th>
+              <th scope="col">  Bounce</th>
+              <th scope="col"> الباقي للوكالات من اليسار</th>
+              <th scope="col"> الباقي للوكالات من اليمين  </th>
+              <th scope="col"> قيمة الوكالة </th>
+              <th scope="col"> قيمة الربح كالة جديدة </th>
+              <th scope="col"> قيمة Bounce</th>
+              <th scope="col"> تارخ الحساب </th>
+              <th scope="col">  الواجب دفعها </th>
+              <th scope="col">  الواردات </th>
+              <th scope="col"> الربح الصافي </th>
+              
+            </tr>
+          </thead>
+          <tbody>
+             {% for log  in logs %}
+            <tr>
+              <td >{{ log.id }}</td>
+            <td class="totalNodes">{{log.totalNodes}}</td>
+      			<td class="totalLike">{{log.totalLike|intcomma}}</td>
+      			<td>{{log.overLike|intcomma}}</td>
+      			<td class="totalBounce">{{log.totalBounce|intcomma}}</td>
+      			<td>{{log.remainLikeleft|intcomma}}</td>
+      			<td>{{log.remainLikeright|intcomma}}</td>
+      			<td class="nodePrice">{{log.nodePrice|intcomma}}</td>
+      			<td class="likePrice">{{log.likePrice|intcomma}}</td>
+      			<td class="BouncePrice">{{log.BouncePrice|intcomma}}</td>
+      			<td>{{log.created|date:"Y/m/d  G:i:s" }}</td>
+      			<td class="totalBlance">{{log.totalBlance|intcomma}}</td>
+
+			<td class="totalnodeBalance"> </td>
+			<td class="summary"> </td>
+              
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+   <div class="row pagination justify-content-center">
+            <div class="paginated">
+        {% if is_paginated %} 
+        {% if logs.has_previous %}
+           <a class="btn btn-outline-info mb-4" href="?page=1&rowNum={{ rowNum }}">الصفحة الاولى</a>
+           <a class="btn btn-outline-info mb-4" href="?page={{ logs.previous_page_number }}&rowNum={{ rowNum }}">الصفحة السابقة</a >
+        {% endif %} 
+        {% for num in logs.paginator.page_range %} 
+        {% if logs.number == num %}
+        <a class="btn btn-info mb-4" href="?page={{ num }}&rowNum={{ rowNum }}">{{ num }}</a>
+        {% elif num > logs.number|add:'-3' and num < logs.number|add:'3' %}
+        <a class="btn btn-outline-info mb-4" href="?page={{ num }}&rowNum={{ rowNum }}">{{ num }}</a>
+        {% endif %} 
+        {% endfor %} 
+        {% if logs.has_next %}
+        <a class="btn btn-outline-info mb-4"  href="?page={{ logs.next_page_number }}&rowNum={{ rowNum }}">التالي</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ logs.paginator.num_pages }}&rowNum={{ rowNum }}">آخر صفحة</a>
+        {% endif %}
+        {% endif %}
+      </div>
+   </div>
+
+   </div>
+  {% endblock content %}
+
+       {% block extrascripts %}
+     <script type="text/javascript">
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+    let totalSummary  = 0 
+
+    let totalSummaryPage   = document.querySelector('#totalSummaryPage')
+    let totalNodes   = document.querySelectorAll('.totalNodes')
+    let totalLike   = document.querySelectorAll('.totalLike')
+    let totalBounce   = document.querySelectorAll('.totalBounce')
+    let nodePrice   = document.querySelectorAll('.nodePrice')
+    let likePrice   = document.querySelectorAll('.likePrice')
+    let BouncePrice   = document.querySelectorAll('.BouncePrice')
+    let totalBlance   = document.querySelectorAll('.totalBlance')
+    let totalnodeBalance   = document.querySelectorAll('.totalnodeBalance')
+    let summary   = document.querySelectorAll('.summary')
+
+    for (let i = 0; i < totalnodeBalance.length; i++) {
+      let totalNodes = totalnodeBalance[i].parentElement.querySelector('.totalNodes').innerHTML.split(",").join("")
+      let nodePrice = totalnodeBalance[i].parentElement.querySelector('.nodePrice').innerHTML.split(",").join("")
+      totalnodeBalance[i].textContent  =  numberWithCommas( totalNodes * nodePrice); 
+      summary[i].textContent  = numberWithCommas( (totalNodes * nodePrice) - (totalBlance[i].innerHTML.split(",").join("")) );
+
+     }
+     for (var i = 0; i < summary.length; i++) {
+     totalSummary  = totalSummary + parseInt((summary[i].textContent.split(",").join("")),10)
+   totalSummaryPage.textContent  = numberWithCommas(totalSummary)
+
+
+       // console.log(parseInt((summary[i].textContent.split(",").join("")),10))
+        
+     }
+
+</script>
+
+
+    {% endblock %}

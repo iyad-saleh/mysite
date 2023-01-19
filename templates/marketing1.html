@@ -1,0 +1,28 @@
+{% load static %}
+
+{% if user.is_superuser %}
+<div class="row d-flex justify-content-center">
+  <div class="col-md-1 text-right mb-2">
+<a  class="btn btn-primary"  href="{% url 'MarketingCreateView'   %}"> جديد </a>
+</div>
+</div>
+  {% endif %}
+<div class="row mr-2 d-flex justify-content-center  ">
+
+ {% for item in marketing %}
+  <div class="col-md-4 text-right   shadow-lg p-3  rounded">
+    <img class="rounded-circle" src="{{ item.image.url }}" alt="Generic placeholder image" width="140" height="140">
+    <h2>{{item.title}}</h2>
+    <p>
+    {{item.content}}</p>
+    <p>
+   
+   {% if user.is_superuser %}
+        <a  class="btn btn-info"  href="{% url 'MarketingUpdateView'  item.id %}"> تعديل </a>
+        <a  class="btn btn-danger"  href="{% url 'MarketingDeleteView'  item.id %}"> حذف </a>
+        {% endif %}
+    </p>
+    </div><!-- /.col-lg-4 -->
+  <hr class="featurette-divider">
+  {% endfor %}
+  </div><!-- /.row -->

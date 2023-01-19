@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container mt-5">
+<div class="row">
+<div class="col text-right">
+    <div class="content-section">
+        <form method="POST"  action="{% url 'receivedforUser' obj.id %}"  >
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">{{obj.first_name}} {{obj.last_name}} باستلام مشترياته</legend>
+               
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">نعم </button>
+                <a class="btn btn-outline-secondary" href="{% url 'UserListView' %}">تراجع </a>
+            </div>
+        </form>
+    </div>
+</div></div></div>
+
+{% endblock content %}

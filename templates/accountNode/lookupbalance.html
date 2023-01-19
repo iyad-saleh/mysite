@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+	<div class="container  m-t5">
+		<div class="row  d-flex justify-content-center   text-center">
+			<div class="col-md-9 col-sm-12 mt-1   shadow-lg p-3  rounded">
+				<div class="media">
+					
+					<div class="media-body">
+						<h5 class="mt-0 font-weight-bold">{{user.first_name}} {{user.profile.father }} {{ user.last_name}}</h5>
+						
+					</div>
+				</div>
+				<div class="media">
+					
+					<div class="media-body">
+						<h5 class="mt-0 font-weight-bold">سيصبح حسابك : {{new_balance}}</h5>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock content %}	

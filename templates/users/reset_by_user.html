@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="row justify-content-md-center align-items-center mt-4">
+
+    <div class="col-md-6 col-sm-10 mx-auto text-right">
+        <div class="content-section">
+       
+            <form method="POST">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">تغيير كلمة السر  لـ {{user}} </legend>
+                    {{ form|crispy }}
+                </fieldset>
+                <div class="form-group">
+                    <button class="btn btn-outline-info" type="submit">حفظ</button>
+                    <a  class="btn btn-info mx-4 " href="{%  url 'homeblog' %}">عودة</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

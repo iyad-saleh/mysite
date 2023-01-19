@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container  ">
+    <div class="row d-flex justify-content-center" style="font-size: 1.3rem;font-weight: 500;">
+        <div class="col col-sm-6 my-5">
+    
+    <div class="content-section">
+        <form method="POST"   action="{% url 'userActive' user.id %}" >
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4 text-right" style="direction:rtl;">تأكيد    </legend>
+                <h2 class="text-right" style="direction:rtl;">"
+                {% if  user.is_active %}
+                      ايقاف     
+                      {% else  %}
+                       تفعيل     
+                        {% endif  %}
+                {{ user.first_name }}"</h2>
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-danger" type="submit"> نعم</button>
+                <a class="btn btn-outline-secondary" href="{% url 'homeblog' %}">تراجع </a>
+            </div>
+        </form>
+    </div>
+
+
+
+        </div>    
+    </div>
+</div>
+ <hr class="featurette-divider  mx-5 my-5">
+{% endblock content %}

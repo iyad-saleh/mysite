@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load auth_extras %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+
+<div class="row d-flex justify-content-center mt-5">
+  <div class="col-sm-11 col-md-11  mx-auto mb-3">
+   
+                <div class="   table-hover table-striped table-sm">
+                   <caption  ><h3  class="text-right">قائمة الموظفين</h3>  </caption>
+                  <table class="table">
+                  <thead>
+                   <tr>
+                
+               
+                      <th scope="col">#</th>
+                      <th scope="col">اسم المستخدم</th>
+                      <th scope="col">الاسم</th>
+                      <th scope="col">اسم الاب </th>
+                      <th scope="col">الشهرة</th>
+                      <th scope="col">الاسبوع الحالي </th>
+                      <th scope="col">الاسبوع الماضي </th>
+                      <th scope="col"> حتى هذه اللحظة</th>
+                
+                      
+                   
+               
+                    </tr>
+                  </thead>
+                  <tbody>
+                     {% for user1 in users  %} 
+                    <tr>
+
+                      <td>{{ user1.id }}</td>
+                      <td>{{ user1.username }}</td>
+                      <td>{{ user1.first_name }}</td>
+                      <td>{{ user1.father }}</td>
+                      <td>{{ user1.last_name }}</td>
+                      <td>{{ user1.new }}</td>
+                      <td>{{ user1.last }}</td>
+                      <td>{{ user1.total }}</td>
+                    
+
+                    
+                </tr>
+                {% endfor  %}
+
+                  </table>
+                </div>
+
+         <div class="paginated">
+        {% if is_paginated %} 
+        {% if users.has_previous %}
+           <a class="btn btn-outline-info mb-4" href="?page=1&rowNum={{ rowNum }}">الصفحة الاولى</a>
+           <a class="btn btn-outline-info mb-4" href="?page={{ users.previous_page_number }}&rowNum={{ rowNum }}">الصفحة السابقة</a >
+
+        <!-- 
+          <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+          <a class="btn btn-outline-info mb-4" href="?page={{ users.previous_page_number }}">Previous</a > -->
+
+        {% endif %} 
+        {% for num in users.paginator.page_range %} 
+        {% if users.number == num %}
+        <a class="btn btn-info mb-4" href="?page={{ num }}&rowNum={{ rowNum }}">{{ num }}</a>
+        {% elif num > users.number|add:'-3' and num < users.number|add:'3' %}
+        <a class="btn btn-outline-info mb-4" href="?page={{ num }}&rowNum={{ rowNum }}">{{ num }}</a>
+        {% endif %} 
+        {% endfor %} 
+        {% if users.has_next %}
+        <a class="btn btn-outline-info mb-4"  href="?page={{ users.next_page_number }}&rowNum={{ rowNum }}">التالي</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ users.paginator.num_pages }}&rowNum={{ rowNum }}">آخر صفحة</a>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+ </div>
+     <hr class="featurette-divider  mx-5 my-5">
+{% endblock content %}

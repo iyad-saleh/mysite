@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load auth_extras %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="row d-flex justify-content-center mr-5 mt-4" style="font-weight: 500;">
+    <div class="col-md-4  col-sm-10 form-inline ">
+        <form class="form-inline " action="{% url 'searchUser' %}">
+          <input  name="q" class="form-control  " type="search" placeholder="البحث عن اسم او كنية" aria-label="Search">
+          <button class="btn btn-success mx-1 mt-1" type="submit">بحث عن مشترك</button>
+        </form>
+      </div>
+
+      <div class="col-md-4 mt-2 col-sm-10 text-right"><span > العدد الكلي :(( {{total}} ))</span><a class="btn btn-primary btn-sm" href="{% url 'UserListView' %}">إظهار</a></div>
+
+      <div class="col-md-4 mt-2 col-sm-10 text-right"><span>لم تستلم مشترياتها :{{notReceived}}</span> <a class="btn btn-primary btn-sm" href="{% url 'Nonereceived' %}">إظهار</a></div>
+      
+</div>
+
+
+<div class="row d-flex justify-content-center">
+  <div class="col-sm-11 col-md-11  mx-auto mb-3">
+   
+                <div class="   table-hover table-striped table-sm">
+                   <caption  ><h3  class="text-right mt-1">قائمة المشتركين</h3>  </caption>
+                  <table class="table" style="font-size: 0.8rem;">
+                  <thead>
+                   <tr>
+                  {% if request.user|has_group:'seller' %}
+                  
+                   <th scope="col">#</th>              
+                   <th scope="col">اسم المستخدم</th>
+                    <th scope="col">الاسم</th>
+                    <th scope="col">اسم الاب </th>
+                    <th scope="col">الشهرة</th>
+                    <th scope="col">استلم</th>
+
+                  {% endif %}
+                  {% if  user.is_staff %}   
+                      <th scope="col">#</th>
+                      <th scope="col">اسم المستخدم</th>
+                      <th scope="col">الاسم</th>
+                      <th scope="col">اسم الاب </th>
+                      <th scope="col">الشهرة</th>
+                       <th scope="col">استلم</th>
+                      <th scope="col">حسابه لدينا</th>
+                      <th scope="col">من اليمين</th>
+                      <th scope="col">من اليسار</th>
+                      <th scope="col">عدد الوكالات</th>
+                      <th scope="col">تعديل</th>
+                 
+                  
+                        {% if user.is_superuser %}
+                        <th scope="col">تفعيل /ايقاف</th>
+                        <th scope="col">زيادة 8 فرص</th>
+                        <th scope="col">توظيف</th>
+                        {% endif  %} 
+                      <th scope="col">تصفير كلمة السر</th>
+                      <th scope="col">تصفير كلمة الخزنة</th>
+                      <th scope="col">تسديد</th>
+                      <th scope="col">تسجيل دخول </th>
+                      <th scope="col">تاريخ الانضمام</th> 
+                      <th scope="col">الموظف</th> 
+                      <th scope="col">البائع</th> 
+                  {% endif  %}  
+                    </tr>
+                  </thead>
+                  <tbody>
+                     {% for user1 in users  %} 
+                    <tr>
+
+                  {% if request.user|has_group:'seller' %}
+
+                      <td>{{ user1.id }}</td>
+                      <td>{{ user1.username }}</td>
+                      <td>{{ user1.first_name }}</td>
+                      <td>{{ user1.profile.father }}</td>
+                      <td>{{ user1.last_name }}</td>
+                      
+                       {% if user1.node_set.first.received    %}
+                      <td><a class="btn btn-success btn-sm disabled" aria-disabled="true"   >استلم</a></td>
+                      {% else  %}
+                      <td><a class="btn btn-warning btn-sm" href="{% url 'confirmreceivedforUser' user1.id %}">لم يستلم</a></td>
+                        {% endif  %}
+
+                  {% endif  %}  
+
+                  {% if  user.is_staff %}
+                      <td>{{ user1.id }}</td>
+                      <td>{{ user1.username }}</td>
+                      <td>{{ user1.first_name }}</td>
+                      <td>{{ user1.profile.father }}</td>
+                      <td>{{ user1.last_name }}</td>
+                       {% if user1.node_set.first.received    %}
+                     <td><a class="btn btn-success btn-sm disabled" aria-disabled="true"   >استلم</a></td>
+                      {% else  %}
+                        <td><a class="btn btn-warning btn-sm" href="{% url 'confirmreceivedforUser' user1.id %}">لم يستلم</a></td> 
+                    {% endif  %}
+                      <td>{{ user1.node_set.first.balance|intcomma }}</td>
+                      <td>{{ user1.node_set.first.right.user.username }}</td>
+                      <td>{{ user1.node_set.first.left.user.username }}</td>
+                      <td>{{ user1.node_set.first.client }}</td> 
+                       <td><a class="btn btn-outline-primary btn-sm" href="{% url 'updateNode' user1.id %}"> تحديث </a></td>
+                
+                 {% if user.is_superuser %}
+                     
+                        {% if  user1.is_active %}
+                         <td><a class="btn btn-warning btn-sm" href="{% url 'userActiveconfirm' user1.id %}"> ايقاف    </a></td>
+                        {% else  %}
+                          <td><a class="btn btn-primary btn-sm" href="{% url 'userActiveconfirm' user1.id %}">تفعيل   </a></td>
+                         {% endif  %} 
+                        <td><a class="btn btn-primary btn-sm" href="{% url 'addChance' user1.id %}">+</a></td> 
+                    {% if  user1.is_staff %}
+
+                          <td><a class="btn btn-success btn-sm" href="{% url 'AddEmployee' user1.id %}">موظف   </a></td>
+                     {% elif user1|has_group:'seller'  %}
+                        <td><a class="btn btn-primary btn-sm" href="{% url 'AddEmployee' user1.id %}">موزع   </a></td>
+                      {% else  %}
+                    <td><a class="btn btn-info btn-sm" href="{% url 'AddEmployee' user1.id %}">وكالة   </a></td>
+                      {% endif  %}     
+
+                 {% endif  %}           
+               
+                      <td><a class="btn btn-danger btn-sm" href="{% url 'confirmPasswordforUser' user1.id %}">ضبط </a></td>
+                     <td><a class="btn btn-danger btn-sm" href="{% url 'confirmPasswordforNode' user1.id %}">ضبط </a></td>
+                      <td><a class="btn btn-success btn-sm" href="{% url 'requesttransactionRoot' id=user1.id  amount=user1.node_set.first.balance %}">تسديد </a></td>
+                   
+                      
+                
+                      <td>{{ user1.last_login|date:" G:i:s Y/m/d " }}</td>
+                      <td>{{ user1.date_joined|date:"Y/m/d" }}</td>
+                      <td>{{ user1.node_set.first.byuser.first_name }}</td>
+                      <td>{{ user1.node_set.first.receiveduser.first_name }}</td>
+        
+                  {% endif  %} 
+                     
+                    </tr>
+                {% endfor  %}
+
+                  </table>
+                </div>
+
+         <div class="paginated">
+        {% if is_paginated %} 
+        {% if users.has_previous %}
+           <a class="btn btn-outline-info mb-4" href="?page=1&rowNum={{ rowNum }}">الصفحة الاولى</a>
+           <a class="btn btn-outline-info mb-4" href="?page={{ users.previous_page_number }}&rowNum={{ rowNum }}">الصفحة السابقة</a >
+
+        <!-- 
+          <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+          <a class="btn btn-outline-info mb-4" href="?page={{ users.previous_page_number }}">Previous</a > -->
+
+        {% endif %} 
+        {% for num in users.paginator.page_range %} 
+        {% if users.number == num %}
+        <a class="btn btn-info mb-4" href="?page={{ num }}&rowNum={{ rowNum }}">{{ num }}</a>
+        {% elif num > users.number|add:'-3' and num < users.number|add:'3' %}
+        <a class="btn btn-outline-info mb-4" href="?page={{ num }}&rowNum={{ rowNum }}">{{ num }}</a>
+        {% endif %} 
+        {% endfor %} 
+        {% if users.has_next %}
+        <a class="btn btn-outline-info mb-4"  href="?page={{ users.next_page_number }}&rowNum={{ rowNum }}">التالي</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ users.paginator.num_pages }}&rowNum={{ rowNum }}">آخر صفحة</a>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+ </div>
+     <hr class="featurette-divider  mx-5 my-5">
+{% endblock content %}
+
+
+
+ <th scope="col">حذف</th>
+<td> <a class="btn btn-danger" href="{% url 'deleteUserconfirm' user1.id %}"> حذف </a></td>

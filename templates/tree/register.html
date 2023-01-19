@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="row d-flex justify-content-center mt-3">
+  <div class="col-sm-5 col-md-3 mt-3   mb-3">
+    <h2>{{temp_txt}}</h2>  
+  </div>
+</div>
+<div class="row d-flex justify-content-center" style="font-size: 1.3rem;font-weight: 500;" >
+   <div class="col-sm-11 col-md-8  mx-auto  ">
+    <div class="content-section text-right" >
+        <form method="POST"    enctype="multipart/form-data">
+            {% csrf_token %}
+            {% include 'bs4_form.html' with form=N_form %}
+            <!-- {{ N_form|crispy }} -->
+             <hr class="featurette-divider  mx-5 my-5">
+            {% include 'bs4_form.html' with form=u_form %}
+            <hr class="featurette-divider  mx-5 my-5">
+            {% include 'bs4_form.html' with form=P_form %} 
+
+            <div class="row d-flex justify-content-center">
+            <div class="col-sm-6 col-md-2  mx-auto ">
+              <button class="btn btn-outline-info  btn-lg mr-5  mt-4" type="submit">حفظ</button>
+            </div>
+            </div>
+         <hr class="featurette-divider  mx-5 my-5">
+        </form>
+    </div>
+    </div>
+    </div>
+     <hr class="featurette-divider  mx-5 my-5">
+{% endblock content %}
+
+{% block style %}
+
+<style type="text/css">
+  .ui-menu{
+     text-align:right!important;
+  }
+
+
+</style>
+    {% endblock style %}
+
+
+
+
+  {% block extrascripts %}
+ 
+
+
+
+<script rel="stylesheet" src="{% static 'jquery-ui.min.js' %}"  ></script>
+      <script type="text/javascript">
+
+
+    $(document).ready(function(){
+    $("#id_parent").autocomplete({
+      source: "{% url 'autocompleteFriend' %}",
+      minLength: 2,
+      open: function(){
+      setTimeout(function () {
+            $('.ui-autocomplete').css('z-index', 99);
+            }, 500);
+            },
+      select: function(event, ui) {
+            event.preventDefault();
+            // console.log(ui.item)
+            $("#id_user_id").val(ui.item.value); // display the selected text
+            $("#id_parent").val(ui.item.label);
+            return false;
+            // $("#id_from_City").val(ui.item.value[1]);
+            // $('#id_from_City_value').text(ui.item.value);
+            // window.location="#"; //location to go when you select an item
+            },
+      // focus: function(event, ui) {
+      //       event.preventDefault();
+            // $('#id_from_airPort_value').text(ui.item.value);
+            // window.location="#"; //location to go when you select an item
+            // },
+      delay: 500,
+      scroll:true,
+      autoFocus: true
+      });
+      });
+</script>
+    {% endblock %}
+
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{% static 'jquery-ui.css' %}">
+
+
+    {% endblock %}
+
+
+
+
+    

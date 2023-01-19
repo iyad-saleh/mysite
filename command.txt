@@ -1,0 +1,301 @@
+*********Getting Started with Linode ***********
+
+after ssh root@x.x.x.x
+
+//  update  linux
+sudo  apt-get update
+
+sudo apt-get upgrade
+// you can put two command togather   apt-get update && apt-get upgrade
+ //////////////////////////////////////////
+echo "django-Anas" > /etc/hostname    //CoryMs or: hostnamectl set-hostname django-Anas
+
+hostname -F /etc/hostname
+
+//display hostname 
+
+hostname
+>>django-Anas
+
+//edit hosts file   // same CoryMs
+nano /etc/hosts
+////////////////////////////////////
+//here we add our ip adress  to our dns 
+****
+127.0.0.1  localhost
+127.0.0.1  ubunto.member.linode.com   ubunto
+x.x.x.x   hostname.example.com  django-Anas    --<  this is new line 
+// then ctrl+x --> y --> enter   to exit and save 
+
+
+// time zone
+dpkg-reconfigure tzdata
+// select you time zone  from menu
+//to check time 
+date  --> ddmmyy hh:mm:ss
+
+********* Securing Your Server ******************
+
+//add another user 
+adduser eyad
+//ask for password 
+
+//add this user to sudo group 
+adduser eyad sudo
+//test  new user 
+exit session 
+start putty ssh with new user
+
+// for more securty create ssh key
+
+ssh-keygen -b 4096   --> this will display the folder to save pulic/private rsa  -->enter
+
+// for windows  ??
+
+
+sudo  netstat -tulpn
+
+//to stop ssh to root
+//inside  file /etc/ssh/sshd_config
+sudo nano  /etc/ssh/sshd_config
+//change  the line 
+PermitRootLogin yes  --> no
+// then ctrl+x --> y --> enter   to exit and save 
+// restart  ssh 
+sudo systemctl restart sshd 
+
+
+*******************  firewall CoryMs  **************
+sudo apt-get install ufw 
+// add some role 
+sudo ufw defualt allow outgoing
+sudo ufw defualt deny incoming        // danger  must have allow ssh  and http 
+sudo ufw allow ssh 
+//to test django 
+sudo ufw allow 8000
+// enabl all roll  first lets check allow port 
+sudo ufw status 
+// here is danger   if you forget enable ssh 
+sudo ufw enable  
+sudo ufw status // to check deffernt 
+
+*******************  python CoryMs  **************
+// install  python3
+
+sudo apt-get install python3-pip
+
+//  install  venv
+sudo apt-get install python3-venv           ///or sudo pip3 install virtualenv
+
+// create  venv in our project folder  ( django_project )
+python3 -m venv django_project/venv         /// or virtualenv venv -p python3
+// active venv
+cd django_project/
+source venv/bin/activate   //  it will give us new word (venv) in start line terminal and we can still in it  to all another installion program like apache2
+//install all package 
+//from  requirements.txt    by this command 
+pip install -r requirements.txt
+
+// or simplay one by one inside venv  pip install django 
+// now we must edit our project   setting.py
+1- ALLOWED_HOSTS = ['our new IP','OUR Domain name ']
+2- add STATIC_ROOT = os.path.join(BASE_DIR, '')
+//now run collectstatic  to collect all static file to new folder static
+python manage.py collectstatic 
+///// now test  our django server !!!!!!  
+python manage.py runserver 0.0.0.0:8000
+
+
+**************** apache2 **************************
+sudo apt-get install apache2
+
+
+// now WSGI  for talk to  python                 ///CoryMs
+sudo apt-get install libapache2-mod-wsgi-py3    ///CoryMs
+// configure apache2                             ///CoryMs
+cd /etc/apache2/sites-available/                 ///CoryMs
+ls            //you will  two files 000-default.conf & default-ssl.conf
+// copy                
+sudo cp  000-default.conf  django_project.conf   ///CoryMs
+//  now edit this new file 
+sudo nano django_project.conf
+//add some line  
+*****
+Alias /static /home/eyad/django_project/static
+  <Directory /home/eyad/django_project/static>
+    Require all granted
+  </Directory>
+
+  Alias /media /home/eyad/django_project/media
+  <Directory /home/eyad/django_project/media>
+    Require all granted
+  </Directory>
+
+  <Directory /home/eyad/django_project/mysite>
+    <Files wsgi.py>
+      Require all granted
+    </Files>
+  </Directory>
+
+  WSGIScriptAlias / /home/eyad/django_project/django_project/wsgi.py
+  WSGIDaemonProcess django_app python-path=/home/eyad/django_project python-home=/home/eyad/django_project/venv
+  WSGIProcessGroup django_app
+
+// test 
+sudo apachectl configtest     --> Syntax OK
+
+  ***********
+// enable   new  
+sudo  a2ensite django_project.conf
+
+// to diable old
+sudo a2dissite 000-default.conf
+
+***********  change owner and mod for database // sqlite3 !! befor reload apache2
+sudo chown :www-data django_project/db.sqlite3
+sudo chmod 664  django_project/db.sqlite3
+sudo chown :www-data django_project/
+sudo chmod 775  django_project/
+ls -la
+
+sudo chown -R :www-data django_project/media/
+sudo chmod -R 775  django_project/media/
+
+sudo chown -R :www-data django_project/media_cdn/
+sudo chmod -R 775  django_project/media_cdn/
+sudo chown -R :www-data django_project/static_cdn/
+sudo chmod -R 775  django_project/static_cdn/
+
+?? what about static ??
+
+******************   finsh   ************************
+************* create new file  for secret info ********
+sudo touch /etc/config.json
+now we must delete  secret key from setting.py and put it in config.json with nano  or befor upload project 
+{
+	"SECRET_KEY" : "xw%^txy2g7t7zntwxy!#gig@ovcf_d$y391w@fd)w2^el&m4mc",
+} 
+
+
+*** retun  to ufw 
+sudo  ufw delete allow 8000
+
+sudo  ufw  allow http/tcp
+
+// reload  apache2
+sudo service apache2 restart 
+******   that's it  from apache2 ******* please test it *
+
+///////lets check  
+//if  we have error  to know  what's happend we must enabl debug
+sudo nano django_project/django_project/settings.py
+DEBUG = True 
+//or change database ??
+//save and reload apache2
+sudo service apache2 restart 
+
+
+
+
+// to diable 
+sudo a2dissite *default
+ 
+// you must reload apache2
+service apache2 reload 
+
+
+cd /var/www/html
+
+sudo mkdir example.com    //    your domen name 
+sudo mkdir  public_html  // for public page
+sudo mkdir  logs         // for logs  for php or apache log 
+
+cd /etc/apache2/
+ls
+cd sites-available/
+// here create our config file for our domain 
+sudo nano example.com.conf
+//  there  is some basic you can copy from another file 
+
+
+// after write new config  you must enable it 
+
+sudo a2ensite example.com.conf
+service apache2 reload
+
+************ Data Base ***************************
+
+// mysql 
+sudo apt-get install mysql-server   // it  aske to set database pass
+//after finsh secure installation 
+sudo mysql_secure_installation  //it will aske what is database pass
+$mysql
+mysql> CREATE USER 'username' IDENTIFIED BY 'password';
+mysql> CREATE DATABASE 	djangoproject;
+mysql> CRANT ALL PRIVILEGES ON djangoproject.* to 'username'
+mysql> FLUSH PRIVIlEGES 
+
+***********  Postgresql *****************
+sudo apt-get update
+sudo apt-get postgresql postgresql-contrib
+
+ls  /etc/postgresql/xxx/main/   // the main file is postgresql.conf
+// check status $sevice postgresql  for all option 
+
+sevice postgresql start 
+sevice postgresql status          // online port 5432 
+sevice postgresql stop  
+sevice postgresql restart  
+
+**
+login in postgres  user its root database
+sudo su postgres     
+//start shell
+psql
+//list all data base 
+\l
+// change password for postgres in shell
+ALTER USER postgres WITH PASSWORD 'ewsd';   // ALTER ROLE
+// WE MUST NEW USER  
+CREATE USER user_1 WITH PASSWORD 'pdn';   // CREATE ROLE
+//CHECK  USERS 	
+\du
+//give premmission  
+ALTER USER 	user_1 WITH SUPERUSER;	 
+
+
+CREATE DATABASE "pdnaccess" WITH  OWNER = postgres  ENCODING = 'UTF8' LC_COLLATE = 'English_United States.1252' LC_CTYPE = 'English_United States.1252'  TABLESPACE = pg_default  CONNECTION LIMIT = -1;
+
+***************Domain *****************
+
+becarefull   whoisGuard  to be enable  
+
+
+
+
+************* https  ************
+from let's Encrypt  web
+sudo apt-get update
+sudo apt-get install software-properties-common
+sudo add-apt-repository universe
+sudo add-apt-repository ppa:certbot/certbot
+sudo apt-get update
+
+sudo apt-get install certbot python-certbot-apache 
+
+// now let's  update apache2 
+
+un comment  and edit  
+ServerName   www.Atc-shopp.com
+
+we must comment the last three line  we add :
+start with WSGI
+
+// then 
+sudo certbot --apache //it will ask for email and agree 
+
+
+sudo certbot renew --dry-run
+
+
+

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+
+<div class="row d-flex  mt-5 justify-content-center " style="font-weight: 500;">
+    <div class="col-md-5  col-sm-10 form-inline">
+    {% if user.is_superuser %}
+        <form class="form-inline " action="{% url 'searchAccountsLog' %}"><span class="mx-1">  </span> 
+          <input  name="q" class="form-control  " type="search" placeholder="البحث عن عملية خلال اسم المشترك" aria-label="Search">
+          <button class="btn btn-success mx-1 " type="submit">بحث عن عملية</button>
+        </form>
+        {% endif %} 
+      </div>
+      <a  class="btn btn-info mx-4 " href="{%  url 'Nodebalanc' %}">عودة</a>
+</div>
+
+
+<div class="row d-flex justify-content-center">
+  <div class="col-sm-11 col-md-8  mx-auto mb-3">
+   
+                <div class="table-responsive table-hover table-striped table-sm">
+                   <caption class="text-right "><h3 class="text-right my-3">قائمة العمليات المالية  </h3></caption>
+                  <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">من حساب</th>
+                      <th scope="col">الى حساب</th>
+                      <th scope="col"> المبلغ </th>
+                      <th scope="col">التاريخ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                     {% for log in logs  %} 
+                      
+                    <tr>
+                    
+                      <td>{{ log.id }}</td>
+                      <td>{{ log.user_from.first_name }} {{ log.user_from.last_name }}</td>
+                      <td>{{ log.user_to.first_name }} {{ log.user_to.last_name }}</td>
+                      <td>{{ log.amount }} ل س </td>
+                      <td>{{ log.created|date:" G:i:s Y/m/d "  }}</td>
+                    </tr>
+                   {% empty %}
+                        <tr> <td>لايوجد اي سجلات .</td><td>لايوجد اي سجلات .</td><td>لايوجد اي سجلات .</td></tr>
+                {% endfor  %}
+                  </table>
+                </div>
+
+         <div class="paginated">
+        {% if is_paginated %} 
+        {% if logs.has_previous %}
+           <a class="btn btn-outline-info mb-4" href="?page=1&rowNum={{ rowNum }}">الصفحة الاولى</a>
+           <a class="btn btn-outline-info mb-4" href="?page={{ logs.previous_page_number }}&rowNum={{ rowNum }}">الصفحة السابقة</a >
+
+        <!-- 
+          <a class="btn btn-outline-info mb-4" href="?page=1">First</a>
+          <a class="btn btn-outline-info mb-4" href="?page={{ logs.previous_page_number }}">Previous</a > -->
+
+        {% endif %} 
+        {% for num in logs.paginator.page_range %} 
+        {% if logs.number == num %}
+        <a class="btn btn-info mb-4" href="?page={{ num }}&rowNum={{ rowNum }}">{{ num }}</a>
+        {% elif num > logs.number|add:'-3' and num < logs.number|add:'3' %}
+        <a class="btn btn-outline-info mb-4" href="?page={{ num }}&rowNum={{ rowNum }}">{{ num }}</a>
+        {% endif %} 
+        {% endfor %} 
+        {% if logs.has_next %}
+        <a class="btn btn-outline-info mb-4"  href="?page={{ logs.next_page_number }}&rowNum={{ rowNum }}">التالي</a>
+        <a class="btn btn-outline-info mb-4" href="?page={{ logs.paginator.num_pages }}&rowNum={{ rowNum }}">آخر صفحة</a>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+ </div>
+     
+{% endblock content %}
